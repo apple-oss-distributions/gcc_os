@@ -2,7 +2,7 @@
 
 # ltcf-cxx.sh - Create a C++ compiler specific configuration
 #
-# Copyright (C) 1996-1999, 2000, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1996-1999, 2000, 2001, 2003 Free Software Foundation, Inc.
 # Originally by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 #
 # Original C++ support by:Gary V. Vaughan <gvv@techie.com>
@@ -68,11 +68,16 @@ if { ac_try='${CC-c++} -E conftest.$ac_ext'; { (eval echo \"$ac_try\") 1>&5; (ev
   # Set up default GNU C++ configuration
 
   # Check if GNU C++ uses GNU ld as the underlying linker, since the
-  # archiving commands below assume that GNU ld is being used.
-  if eval "`$CC -print-prog-name=ld` --version 2>&1" | \
-      egrep 'GNU ld' > /dev/null; then
-    with_gnu_ld=yes
+  # archiving commands below assume that GNU ld is being used.  The
+  # assumption here is that the linker is going to be the same as that
+  # used by the C compiler.  For the purposes of GCC, this is ok, but
+  # if someone uses g++ along with a non-GNU C compiler that doesn't
+  # use GNU ld, we may lose.  This is ok for the toolchain tree, since
+  # the only users of ltcf-cxx.sh are libstdc++-v3 and libjava,
+  # anyway, and those use both gcc and g++, so the settings are bound
+  # to be the same.
 
+  if test "$with_gnu_ld" = yes; then
     archive_cmds='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname $wl$soname -o $lib'
     archive_expsym_cmds='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname $wl$soname ${wl}-retain-symbols-file $wl$export_symbols -o $lib'
 
@@ -92,7 +97,6 @@ if { ac_try='${CC-c++} -E conftest.$ac_ext'; { (eval echo \"$ac_try\") 1>&5; (ev
       whole_archive_flag_spec=
     fi
   else
-    with_gnu_ld=no
     wlarc=
 
     # A generic and very simple default shared library creation
@@ -110,7 +114,6 @@ if { ac_try='${CC-c++} -E conftest.$ac_ext'; { (eval echo \"$ac_try\") 1>&5; (ev
 
 else
   with_gcc=no
-  with_gnu_ld=no
   wlarc=
 fi
 
@@ -250,11 +253,17 @@ case $host_os in
     ;;
   hpux*)
     if test $with_gnu_ld = no; then
-      hardcode_libdir_flag_spec='${wl}+b ${wl}$libdir'
+      case "$host_cpu" in
+	ia64*)
+	  hardcode_libdir_flag_spec='-L$libdir'
+	  hardcode_shlibpath_var=no ;;
+	*)
+	  hardcode_libdir_flag_spec='${wl}+b ${wl}$libdir' ;;
+      esac
+      hardcode_direct=yes
       hardcode_libdir_separator=:
       export_dynamic_flag_spec='${wl}-E'
     fi
-    hardcode_direct=yes
     hardcode_minus_L=yes # Not in the search PATH, but as the default
 			 # location of the library.
 
@@ -283,7 +292,14 @@ case $host_os in
 	  if test $with_gnu_ld = no; then
 	    case "$host_os" in
 	    hpux9*) archive_cmds='$rm $output_objdir/$soname~$CC -shared -nostdlib -fPIC ${wl}+b ${wl}$install_libdir -o $output_objdir/$soname $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
-	    *) archive_cmds='$CC -shared -nostdlib -fPIC ${wl}+h ${wl}$soname ${wl}+b ${wl}$install_libdir -o $lib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags' ;;
+	    *)
+	      case "$host_cpu" in
+		ia64*)
+		  archive_cmds='$LD -b +h $soname -o $lib $predep_objects $libobjs $deplibs $postdep_objects $linker_flags' ;;
+		*)
+		  archive_cmds='$CC -shared -nostdlib -fPIC ${wl}+h ${wl}$soname ${wl}+b ${wl}$install_libdir -o $lib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags' ;;
+	      esac
+	      ;;
 	    esac
 	  fi
 	else
@@ -310,7 +326,7 @@ case $host_os in
           if test "$with_gnu_ld" = no; then
             archive_cmds='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname `test -n "$verstring" && echo ${wl}-set_version ${wl}$verstring` ${wl}-update_registry ${wl}${objdir}/so_locations -o $lib'
           else
-            archive_cmds='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $linker_flags -soname $soname `test -n "$verstring" && echo -set_version $verstring` -o $lib'
+            archive_cmds='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -soname $soname `test -n "$verstring" && echo -set_version $verstring` -o $lib'
           fi
         fi
         hardcode_libdir_flag_spec='${wl}-rpath ${wl}$libdir'
@@ -597,9 +613,9 @@ case $host_os in
         if test "$with_gcc" = yes && test "$with_gnu_ld" = no; then
 	  no_undefined_flag=' ${wl}-z ${wl}defs'
           if $CC --version | egrep -v '^2\.7' > /dev/null; then
-            archive_cmds='$CC -shared -nostdlib $LDFLAGS $predep_objects $libobjs $deplibs $postdep_objects $linker_flags ${wl}-h $wl$soname -o $lib'
+            archive_cmds='$CC -shared -nostdlib $LDFLAGS $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-h $wl$soname -o $lib'
             archive_expsym_cmds='$echo "{ global:" > $lib.exp~cat $export_symbols | sed -e "s/\(.*\)/\1;/" >> $lib.exp~$echo "local: *; };" >> $lib.exp~
-		$CC -shared -nostdlib ${wl}-M $wl$lib.exp -o $lib $predep_objects $libobjs $deplibs $postdep_objects $linker_flags~$rm $lib.exp'
+		$CC -shared -nostdlib ${wl}-M $wl$lib.exp -o $lib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags~$rm $lib.exp'
 
             # Commands to make compiler produce verbose output that lists
             # what "hidden" libraries, object files and flags are used when
@@ -608,9 +624,9 @@ case $host_os in
           else
             # g++ 2.7 appears to require `-G' NOT `-shared' on this
             # platform.
-            archive_cmds='$CC -G -nostdlib $LDFLAGS $predep_objects $libobjs $deplibs $postdep_objects $linker_flags ${wl}-h $wl$soname -o $lib'
+            archive_cmds='$CC -G -nostdlib $LDFLAGS $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-h $wl$soname -o $lib'
             archive_expsym_cmds='$echo "{ global:" > $lib.exp~cat $export_symbols | sed -e "s/\(.*\)/\1;/" >> $lib.exp~$echo "local: *; };" >> $lib.exp~
-		$CC -G -nostdlib ${wl}-M $wl$lib.exp -o $lib $predep_objects $libobjs $deplibs $postdep_objects $linker_flags~$rm $lib.exp'
+		$CC -G -nostdlib ${wl}-M $wl$lib.exp -o $lib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags~$rm $lib.exp'
 
             # Commands to make compiler produce verbose output that lists
             # what "hidden" libraries, object files and flags are used when

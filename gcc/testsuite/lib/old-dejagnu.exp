@@ -432,6 +432,9 @@ proc old-dejagnu { compiler prog name cflagsx default_cflags libs } {
 	}
     }
 
+    # APPLE LOCAL testsuite OS flush bug workaround
+    lappend cflags "additional_flags=-fslow-exit"
+
     # Since we don't check return status of the compiler, make sure
     # we can't run a.out when the compilation fails.
     remote_file build delete $output
@@ -445,7 +448,7 @@ proc old-dejagnu { compiler prog name cflagsx default_cflags libs } {
     # Delete things like "ld.so: warning" messages.
     set comp_output [prune_gcc_output [prune_warnings $comp_output]]
 
-    if [regexp "Internal (compiler )?error" $comp_output] then {
+    if [regexp "\[Ii\]nternal (compiler )?error" $comp_output] then {
         if $expect_crash then {
 	    setup_xfail "*-*-*"
 	}

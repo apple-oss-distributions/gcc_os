@@ -29,8 +29,8 @@
 #3259830: g++.dg/ext/instantiate1.C (test for excess errors)
 #3259830: g++.dg/ext/instantiate2.C (test for excess errors)
 #3220984: g++.dg/altivec-5.C (test for excess errors)
+#3219341: g++.dg/abi/layout2.C (test for excess errors)
 ###------------------------------------------------------------------
-3219341: g++.dg/abi/layout2.C (test for excess errors)
 3220997: g++.dg/align-test-1.C execution test
 3242489: g++.dg/compat/abi/bitfield1_y.C (test for excess errors)
 3242504: g++.dg/compat/abi/vbase8-10_x.C (test for excess errors)
