@@ -253,6 +253,7 @@ in the following sections.
 @c APPLE LOCAL begin ObjC options
 -fgnu-runtime  -fnext-runtime  @gol
 -fno-nil-receivers (APPLE ONLY) @gol
+-fobjc-direct-dispatch (APPLE ONLY) @gol
 -fobjc-exceptions (APPLE ONLY) @gol
 -freplace-objc-classes (APPLE ONLY) @gol
 -fzero-link (APPLE ONLY) @gol
@@ -2080,8 +2081,18 @@ used.
 Assume that all Objective-C message dispatches (e.g., 
 @code{[receiver message:arg]}) in this translation unit ensure that the receiver 
 is not @code{nil}.  This allows for more efficient entry points in the runtime to be 
-used.  Currently, this option is only available in conjunciton with 
+used.  Currently, this option is only available in conjunction with
 the NeXT runtime.
+
+@item -fobjc-direct-dispatch @r{(APPLE ONLY)}
+@opindex -fobjc-direct-dispatch
+For some functions (such as @code{objc_msgSend}) called very frequently by
+Objective-C programs, special entry points exist in high memory that may be jumped
+to directly (e.g., via the @code{"bla"} instruction on the PowerPC) for improved
+performance.  The @option{-fobjc-direct-dispatch} option will cause such jumps
+to be generated.  This option is only available in conjunction with the NeXT
+runtime; furthermore, programs built with the @option{-fobjc-direct-dispatch}
+option will only run on Mac OS X 10.4 (Tiger) or later systems.
 
 @item -fobjc-exceptions @r{(APPLE ONLY)}
 @opindex -fobjc-exceptions

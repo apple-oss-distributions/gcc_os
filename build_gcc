@@ -1543,7 +1543,7 @@ install_fat()
 		    libtool_cmd="libtool -o $fat_file -arch_only ppc $sym/$host/lib/ppc/libstdc++.clean.a"
 		fi
 
-		libtool_cmd="mkdir -p $fat/$privatelib && $libtool_cmd -dynamic -L$fat/$lib -lSystem -lgcc -install_name $privatelib/$LIBSTDCPP_DYLIB -v -current_version 1 -compatibility_version 1"
+		libtool_cmd="mkdir -p $fat/$privatelib && $libtool_cmd -dynamic -L$fat/$lib -lSystem -lmx -lgcc -install_name $privatelib/$LIBSTDCPP_DYLIB -v -current_version 1 -compatibility_version 1"
 	    fi
 
 	    # libtool makes libraries fat...
