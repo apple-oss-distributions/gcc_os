@@ -844,6 +844,34 @@ extern int flag_new_for_scope;
 
 extern int flag_weak;
 
+/* Nonzero if the user permits us to skip declarations that are not
+   actually referenced in the rest of the program (possibly meaning
+   that error messages for those declarations are not output).  */
+
+/* APPLE LOCAL begin jet */
+extern int flag_jet;
+
+/*  Debugging: print extra information for jet debugging.
+     1 - dump token stream before jet runs
+     2 - dump token stream after jet runs
+     4 - dump region array
+     8 - dump jet's identifier hashtable
+    16 - print timing for jet processing
+    32 - print hashing information.
+    Values may be orred together.
+*/
+
+extern int flag_debug_jet;
+
+/* A hash code provided on the command line.  If it is nonzero, and if
+   we are using jet, then calculate a hash of unstripped tokens, compare
+   it to this value, and don't do the compilation if the two are equal.
+ */
+
+extern unsigned int flag_jet_hash_code;
+
+/* APPLE LOCAL end jet */
+
 /* Nonzero to use __cxa_atexit, rather than atexit, to register
    destructors for local statics and global objects.  */
 
@@ -1490,6 +1518,7 @@ extern tree get_atsign_identifier		PARAMS ((tree));
 extern void clear_cw_asm_labels			PARAMS ((void));
 extern tree cw_asm_reg_name			PARAMS ((tree));
 extern tree get_cw_asm_label			PARAMS ((tree));
+extern tree cw_asm_entry			PARAMS ((tree, tree, tree));
 /* APPLE LOCAL end CW asm blocks */
 
 #endif /* ! GCC_C_COMMON_H */

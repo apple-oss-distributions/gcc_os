@@ -247,6 +247,8 @@ static void sanitize_cpp_opts PARAMS ((void));
   OPT("fconstant-cfstrings",	CL_ALL,   OPT_fconstant_cfstrings)	     \
   OPT("fconstant-string-class=", CL_OBJC | CL_JOINED,			     \
 					  OPT_fconstant_string_class)	     \
+  /* APPLE LOCAL jet */ \
+  OPT("fdebug-jet=", CL_CXX | CL_JOINED, OPT_fdebug_jet_)                   \
   OPT("fdefault-inline",	CL_CXX,   OPT_fdefault_inline)		     \
   OPT("fdollars-in-identifiers",CL_ALL,   OPT_fdollars_in_identifiers)	     \
   OPT("fdump-",			CL_ALL | CL_JOINED, OPT_fdump)		     \
@@ -270,6 +272,8 @@ static void sanitize_cpp_opts PARAMS ((void));
   OPT("fimplicit-templates",	CL_CXX,   OPT_fimplicit_templates)	     \
   /* APPLE LOCAL -findirect-virtual-calls */  \
   OPT("findirect-virtual-calls",CL_CXX,   OPT_findirect_virtual_calls)	     \
+  /* APPLE LOCAL jet */ \
+  OPT("fjet-hash=", CL_ALL | CL_JOINED,   OPT_fjet_hash_)                    \
   OPT("flabels-ok",		CL_CXX,   OPT_flabels_ok)		     \
   OPT("fms-extensions",		CL_ALL,   OPT_fms_extensions)		     \
   OPT("fname-mangling-version-",CL_CXX | CL_JOINED, OPT_fname_mangling)	     \
@@ -304,6 +308,8 @@ static void sanitize_cpp_opts PARAMS ((void));
   OPT("fshow-column",		CL_ALL,   OPT_fshow_column)		     \
   OPT("fsigned-bitfields",	CL_ALL,   OPT_fsigned_bitfields)	     \
   OPT("fsigned-char",		CL_ALL,   OPT_fsigned_char)		     \
+  /* APPLE LOCAL jet */ \
+  OPT("fskip-unused-source",    CL_ALL,   OPT_fskip_unused_source)           \
   OPT("fsquangle",		CL_CXX,   OPT_fsquangle)		     \
   OPT("fstats",			CL_CXX,   OPT_fstats)			     \
   OPT("fstrict-prototype",	CL_CXX,   OPT_fstrict_prototype)	     \
@@ -420,6 +426,8 @@ missing_arg (opt_index)
     case OPT_fdump:
     case OPT_fname_mangling:
     case OPT_ftabstop:
+    /* APPLE LOCAL jet */
+    case OPT_fdebug_jet_:
     case OPT_ftemplate_depth:
     default:
       error ("missing argument to \"-%s\"", opt_text);
@@ -1318,6 +1326,30 @@ c_common_decode_option (argc, argv)
       flag_signed_char = on;
       break;
 
+    /* APPLE LOCAL begin jet */
+    case OPT_fskip_unused_source:
+      flag_jet = on;
+      break;
+    
+    case OPT_fdebug_jet_:
+      flag_debug_jet = read_integral_parameter (arg, argv[0], 0);
+      break;
+
+    case OPT_fjet_hash_:
+      {
+	char *end;
+	unsigned long n = strtoul (arg, &end, 10);
+	flag_jet_hash_code = 0;
+
+	if (*end == '\0' && n <= UINT_MAX)
+	  flag_jet_hash_code = n;
+	else
+	  error ("invalid option `%s'", argv[0]);
+
+	break;
+      }
+    /* APPLE LOCAL end jet */
+
     case OPT_funsigned_bitfields:
       flag_signed_bitfields = !on;
       explicit_flag_signed_bitfields = 1;
@@ -1696,7 +1728,7 @@ preprocess_file ()
   if (out_stream == NULL)
     fatal_io_error ("opening output file %s", out_fname);
   else
-    cpp_preprocess_file (parse_in, in_fname, out_stream);
+    cpp_preprocess_file (parse_in, in_fname, out_stream, ident_hash);
 }
 
 /* Front end initialization common to C, ObjC and C++.  */

@@ -54,10 +54,11 @@ static void cb_def_pragma PARAMS ((cpp_reader *, unsigned int));
 
 /* Preprocess and output.  */
 void
-cpp_preprocess_file (pfile, in_fname, out_stream)
+cpp_preprocess_file (pfile, in_fname, out_stream, hh)
      cpp_reader *pfile;
      const char *in_fname;
      FILE *out_stream;
+     struct ht *hh;
 {
   /* Initialize the printer structure.  Setting print.line to -1 here
      is a trick to guarantee that the first token of the file will
@@ -70,7 +71,7 @@ cpp_preprocess_file (pfile, in_fname, out_stream)
 
   setup_callbacks (pfile);
 
-  if (cpp_read_main_file (pfile, in_fname, NULL))
+  if (cpp_read_main_file (pfile, in_fname, hh))
     {
       cpp_options *options = &pfile->opts;
       cpp_finish_options (pfile);

@@ -901,19 +901,20 @@ note_yacc_type (o, fields, typeinfo, pos)
 }
 
 static void process_gc_options PARAMS ((options_p, enum gc_used_enum, 
-					int *, int *, int *));
+					int *, int *, int *, type_p *));
 static void set_gc_used_type PARAMS ((type_p, enum gc_used_enum, type_p *));
 static void set_gc_used PARAMS ((pair_p));
 
 /* Handle OPT for set_gc_used_type.  */
 
 static void
-process_gc_options (opt, level, maybe_undef, pass_param, length)
+process_gc_options (opt, level, maybe_undef, pass_param, length, nested_ptr)
      options_p opt;
      enum gc_used_enum level;
      int *maybe_undef;
      int *pass_param;
      int *length;
+     type_p *nested_ptr;
 {
   options_p o;
   for (o = opt; o; o = o->next)
@@ -925,6 +926,8 @@ process_gc_options (opt, level, maybe_undef, pass_param, length)
       *pass_param = 1;
     else if (strcmp (o->name, "length") == 0)
       *length = 1;
+    else if (strcmp (o->name, "nested_ptr") == 0)
+      *nested_ptr = ((const struct nested_ptr_data *) o->info)->type;
 }
 
 /* Set the gc_used field of T to LEVEL, and handle the types it references.  */
@@ -947,18 +950,24 @@ set_gc_used_type (t, level, param)
       {
 	pair_p f;
 	int dummy;
+	type_p dummy2;
 
-	process_gc_options (t->u.s.opt, level, &dummy, &dummy, &dummy);
+	process_gc_options (t->u.s.opt, level, &dummy, &dummy, &dummy,
+			    &dummy2);
 
 	for (f = t->u.s.fields; f; f = f->next)
 	  {
 	    int maybe_undef = 0;
 	    int pass_param = 0;
 	    int length = 0;
+	    type_p nested_ptr = NULL;
 	    process_gc_options (f->opt, level, &maybe_undef, &pass_param,
-				&length);
+				&length, &nested_ptr);
 	    
-	    if (length && f->type->kind == TYPE_POINTER)
+	    if (nested_ptr && f->type->kind == TYPE_POINTER)
+	      set_gc_used_type (nested_ptr, GC_POINTED_TO, 
+				pass_param ? param : NULL);
+	    else if (length && f->type->kind == TYPE_POINTER)
 	      set_gc_used_type (f->type->u.p, GC_USED, NULL);
 	    else if (maybe_undef && f->type->kind == TYPE_POINTER)
 	      set_gc_used_type (f->type->u.p, GC_MAYBE_POINTED_TO, NULL);
@@ -1051,7 +1060,7 @@ create_file (name, oname)
      const char *oname;
 {
   static const char *const hdr[] = {
-    "   Copyright (C) 2002 Free Software Foundation, Inc.\n",
+    "   Copyright (C) 2004 Free Software Foundation, Inc.\n",
     "\n",
     "This file is part of GCC.\n",
     "\n",
@@ -1130,7 +1139,6 @@ open_base_files ()
 
   /* gtype-desc.c is a little special, so we create it here.  */
   {
-    /* APPLE LOCAL begin - 3.4 scheduler update */
     /* The order of files here matters very much.  */
     static const char *const ifiles [] = {
       "config.h", "system.h", "varray.h",
@@ -1138,17 +1146,9 @@ open_base_files ()
       "function.h", "insn-config.h", "expr.h", "hard-reg-set.h",
       "basic-block.h", "cselib.h", "insn-addr.h", "ssa.h", "optabs.h",
       "libfuncs.h", "debug.h", "ggc.h",
+      "cpp-id-data.h",
       NULL
     };
-    /*    static const char *const ifiles [] = {
-      "config.h", "system.h", "coretypes.h", "tm.h", "varray.h",
-      "hashtab.h", "splay-tree.h", "bitmap.h", "tree.h", "rtl.h",
-      "function.h", "insn-config.h", "expr.h", "hard-reg-set.h",
-      "basic-block.h", "cselib.h", "insn-addr.h", "ssa.h", "optabs.h",
-      "libfuncs.h", "debug.h", "ggc.h",
-      NULL
-      }; */
-    /* APPLE LOCAL end - 3.4 scheduler update */
     const char *const *ifp;
     outf_p gtype_desc_c;
       
@@ -1466,7 +1466,8 @@ struct walk_type_data
   int used_length;
   type_p orig_s;
   const char *reorder_fn;
-  int needs_cast_p;  /* APPLE LOCAL - 3.4 scheduler update */
+  int needs_cast_p;
+  int fn_wants_lvalue;
 };
 
 /* Print a mangled name representing T to OF.  */
@@ -1573,6 +1574,7 @@ walk_type (t, d)
   int use_param_num = -1;
   int use_params_p = 0;
   options_p oo;
+  const struct nested_ptr_data *nested_ptr_d = NULL;
   
   /* APPLE LOCAL begin - 3.4 scheduler update */
   d->needs_cast_p = 0;
@@ -1589,6 +1591,8 @@ walk_type (t, d)
       use_params_p = 1;
     else if (strcmp (oo->name, "desc") == 0)
       desc = (const char *)oo->info;
+    else if (strcmp (oo->name, "nested_ptr") == 0)
+      nested_ptr_d = (const struct nested_ptr_data *) oo->info;
     else if (strcmp (oo->name, "dot") == 0)
       ;
     else if (strcmp (oo->name, "tag") == 0)
@@ -1693,7 +1697,53 @@ walk_type (t, d)
 		break;
 	      }
 	    
-	    d->process_field (t->u.p, d);
+	    if (nested_ptr_d)
+	      {
+		const char *oldprevval2 = d->prev_val[2];
+
+		if (! UNION_OR_STRUCT_P (nested_ptr_d->type))
+		  {
+		    error_at_line (d->line,
+				   "field `%s' has invalid "
+				   "option `nested_ptr'\n",
+				   d->val);
+		    return;
+		  }
+
+		d->prev_val[2] = d->val;
+		oprintf (d->of, "%*s{\n", d->indent, "");
+		d->indent += 2;
+		d->val = xasprintf ("x%d", d->counter++);
+		oprintf (d->of, "%*s%s %s * %s%s =\n", d->indent, "",
+			 (nested_ptr_d->type->kind == TYPE_UNION 
+			  ? "union" : "struct"), 
+			 nested_ptr_d->type->u.s.tag, 
+			 d->fn_wants_lvalue ? "" : "const ",
+			 d->val);
+		oprintf (d->of, "%*s", d->indent + 2, "");
+		output_escaped_param (d, nested_ptr_d->convert_from,
+				      "nested_ptr");
+		oprintf (d->of, ";\n");
+
+		d->process_field (nested_ptr_d->type, d);
+
+		if (d->fn_wants_lvalue)
+		  {
+		    oprintf (d->of, "%*s%s = ", d->indent, "",
+			     d->prev_val[2]);
+		    d->prev_val[2] = d->val;
+		    output_escaped_param (d, nested_ptr_d->convert_to,
+					  "nested_ptr");
+		    oprintf (d->of, ";\n");
+		  }
+
+		d->indent -= 2;
+		oprintf (d->of, "%*s}\n", d->indent, "");
+		d->val = d->prev_val[2];
+		d->prev_val[2] = oldprevval2;
+	      }
+	    else
+	      d->process_field (t->u.p, d);
 	  }
 	else 
 	  {
@@ -1865,6 +1915,7 @@ walk_type (t, d)
 	    d->line = &f->line;
 	    d->val = newval = xasprintf ("%s%s%s", oldval, dot, f->name);
 	    d->opt = f->opt;
+	    d->used_length = false;
 
 	    if (union_p && use_param_p && d->param == NULL)
 	      oprintf (d->of, "%*sabort();\n", d->indent, "");
@@ -2273,7 +2324,7 @@ write_types_local_process_field (f, d)
 /* For S, a structure that's part of ORIG_S, and using parameters
    PARAM, write out a routine that:
    - Is of type gt_note_pointers
-   - If calls PROCESS_FIELD on each field of S or its substructures.
+   - Calls PROCESS_FIELD on each field of S or its substructures.
 */
 
 static void
@@ -2304,6 +2355,7 @@ write_local_func_for_structure (orig_s, s, param)
   d.prev_val[1] = "not valid postage";  /* guarantee an error */
   d.prev_val[3] = "x";
   d.val = "(*x)";
+  d.fn_wants_lvalue = true;
 
   oprintf (d.of, "\n");
   oprintf (d.of, "void\n");

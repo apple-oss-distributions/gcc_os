@@ -161,12 +161,12 @@
 #3301194: gcc.dg/format/zero-length-1.c  -DWIDE  (test for excess errors)
 ###-----------------------------------------------------------------------------------
 ## --- The below tests used to fail on Panther, now work, still fails on Smeagol/Jaguar.
-3056057: gcc.dg/format/c99-scanf-3.c   vfscanf (test for warnings, line 21)
-3056057: gcc.dg/format/c99-scanf-3.c  -DWIDE  vfscanf (test for warnings, line 21)
-3056057: gcc.dg/format/ext-6.c   vfscanf (test for warnings, line 42)
-3056057: gcc.dg/format/ext-6.c  -DWIDE  vfscanf (test for warnings, line 42)
-3132068: gcc.dg/wchar_t-1.c (test for excess errors)
-3132068: gcc.dg/wint_t-1.c (test for excess errors)
+#3056057: gcc.dg/format/c99-scanf-3.c   vfscanf (test for warnings, line 21)
+#3056057: gcc.dg/format/c99-scanf-3.c  -DWIDE  vfscanf (test for warnings, line 21)
+#3056057: gcc.dg/format/ext-6.c   vfscanf (test for warnings, line 42)
+#3056057: gcc.dg/format/ext-6.c  -DWIDE  vfscanf (test for warnings, line 42)
+#3132068: gcc.dg/wchar_t-1.c (test for excess errors)
+#3132068: gcc.dg/wint_t-1.c (test for excess errors)
 ###-----------------------------------------------------------------------------------
 2863546: gcc.dg/cpp/cxxcom2.c #line extension (test for warnings, line 5)
 3191351: gcc.c-torture/compile/20000518-1.c,  -O1  
@@ -185,24 +185,28 @@
 3233476: gcc.c-torture/compile/simd-1.c,  -O3 -fomit-frame-pointer
 3233476: gcc.c-torture/compile/simd-1.c,  -O3 -g
 3233476: gcc.c-torture/compile/simd-1.c,  -Os
+3233476: gcc.c-torture/compile/simd-1.c,  -fast
 3233476: gcc.c-torture/compile/simd-5.c,  -O0  
 3233476: gcc.c-torture/compile/simd-5.c,  -O1  
 3233476: gcc.c-torture/compile/simd-5.c,  -O2  
 3233476: gcc.c-torture/compile/simd-5.c,  -O3 -fomit-frame-pointer  
 3233476: gcc.c-torture/compile/simd-5.c,  -O3 -g  
 3233476: gcc.c-torture/compile/simd-5.c,  -Os  
+3233476: gcc.c-torture/compile/simd-5.c,  -fast
 3233562: gcc.c-torture/compile/simd-2.c,  -O0  
 3233562: gcc.c-torture/compile/simd-2.c,  -O1  
 3233562: gcc.c-torture/compile/simd-2.c,  -O2  
 3233562: gcc.c-torture/compile/simd-2.c,  -O3 -fomit-frame-pointer  
 3233562: gcc.c-torture/compile/simd-2.c,  -O3 -g  
 3233562: gcc.c-torture/compile/simd-2.c,  -Os  
+3233562: gcc.c-torture/compile/simd-2.c,  -fast
 3233562: gcc.c-torture/compile/simd-3.c,  -O0  
 3233562: gcc.c-torture/compile/simd-3.c,  -O1  
 3233562: gcc.c-torture/compile/simd-3.c,  -O2  
 3233562: gcc.c-torture/compile/simd-3.c,  -O3 -fomit-frame-pointer  
 3233562: gcc.c-torture/compile/simd-3.c,  -O3 -g  
 3233562: gcc.c-torture/compile/simd-3.c,  -Os  
+3233562: gcc.c-torture/compile/simd-3.c,  -fast
 3233562: gcc.c-torture/compile/simd-4.c,  -O1  
 3233562: gcc.c-torture/compile/simd-4.c,  -O2  
 3233562: gcc.c-torture/compile/simd-4.c,  -O3 -fomit-frame-pointer  
@@ -226,9 +230,10 @@
 3233613: gcc.c-torture/execute/20020412-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
 3233613: gcc.c-torture/execute/20020412-1.c execution,  -O3 -g 
 3233613: gcc.c-torture/execute/20020412-1.c execution,  -Os 
-3233626: gcc.c-torture/execute/pure-1.c compilation,  -O1 
-3233626: gcc.c-torture/execute/pure-1.c compilation,  -O2 
-3233626: gcc.c-torture/execute/pure-1.c compilation,  -Os 
+3233613: gcc.c-torture/execute/20020412-1.c execution,  -fast 
+#3233626: gcc.c-torture/execute/pure-1.c compilation,  -O1 
+#3233626: gcc.c-torture/execute/pure-1.c compilation,  -O2 
+#3233626: gcc.c-torture/execute/pure-1.c compilation,  -Os 
 3239546: gcc.dg/debug/20020220-1.c -gdwarf-2 (test for excess errors)
 3239546: gcc.dg/debug/20020220-1.c -gdwarf-2 -O (test for excess errors)
 3239546: gcc.dg/debug/20020220-1.c -gdwarf-2 -O3 (test for excess errors)
@@ -276,3 +281,22 @@
 3240754: gcc.dg/simd-1.c (test for excess errors)
 3266222: gcc.dg/pch/apple-altivec-1.c -O0 -g assembly comparison
 3266222: gcc.dg/pch/apple-altivec-1.c  -O3 -g  assembly comparison
+3723012: gcc.c-torture/execute/20000822-1.c compilation,  -fast
+3723012: gcc.c-torture/execute/20010209-1.c compilation,  -fast
+3723012: gcc.c-torture/execute/nestfunc-1.c compilation,  -fast
+3723012: gcc.c-torture/execute/nestfunc-2.c compilation,  -fast
+3723012: gcc.c-torture/execute/nestfunc-3.c compilation,  -fast
+3723012: gcc.c-torture/execute/921017-1.c compilation,  -fast
+3723012: gcc.c-torture/execute/970217-1.c execution,  -fast
+3723467: gcc.c-torture/execute/eeprof-1.c execution,  -fast
+3673618: gcc.c-torture/execute/ieee/fp-cmp-1.c execution,  -fast
+3673618: gcc.c-torture/execute/ieee/fp-cmp-2.c execution,  -fast
+3673618: gcc.c-torture/execute/ieee/fp-cmp-3.c execution,  -fast
+3673618: gcc.c-torture/execute/ieee/fp-cmp-4.c execution,  -fast
+3673618: gcc.c-torture/execute/ieee/fp-cmp-5.c execution,  -fast
+3673618: gcc.c-torture/execute/ieee/mzero2.c execution,  -fast
+3673618: gcc.c-torture/execute/ieee/rbug.c execution,  -fast
+3719001: gcc.dg/noncompile/930622-2.c  -fast  (test for excess errors)
+3723667: gcc.dg/pch/inline-3.c  -fast  assembly comparison
+3723667: gcc.dg/pch/inline-4.c  -fast  assembly comparison
+

@@ -2346,12 +2346,12 @@ check_global_declarations (vec, len)
 	 because many programs have static variables
 	 that exist only to get some text into the object file.  */
       if (TREE_CODE (decl) == FUNCTION_DECL
-	  && (warn_unused_function
-	      || TREE_SYMBOL_REFERENCED (DECL_ASSEMBLER_NAME (decl)))
 	  && DECL_INITIAL (decl) == 0
 	  && DECL_EXTERNAL (decl)
 	  && ! DECL_ARTIFICIAL (decl)
-	  && ! TREE_PUBLIC (decl))
+	  && ! TREE_PUBLIC (decl)
+	  && (warn_unused_function
+	      || TREE_SYMBOL_REFERENCED (DECL_ASSEMBLER_NAME (decl))))
 	{
 	  if (TREE_SYMBOL_REFERENCED (DECL_ASSEMBLER_NAME (decl)))
 	    pedwarn_with_decl (decl,
@@ -5952,6 +5952,33 @@ do_compile ()
   timevar_stop (TV_TOTAL);
   timevar_print (stderr);
 }
+/* APPLE LOCAL begin jet */
+/* A hash code taken from all options in argv. */
+unsigned int toplev_argv_hash;
+
+/* Compute a hash code based on all options on the command line.  
+   This is intended to identify identical compilations.  Minor
+   detail: we don't quite use *all* the options, because we want
+   the hash code to be deterministic and the driver usually chooses
+   the output filename randomly. */
+static void
+init_toplev_hash_code (unsigned int argc, const char **argv)
+{
+  unsigned int val = 137;
+  bool output_option = false;
+
+  for ( ; argc ; --argc, ++argv)
+    {
+      const char *s = *argv;
+      if (!output_option)
+	while (*s)
+	  val = val * 67 + ((unsigned) *s++ - 113);
+      output_option = strcmp(*argv, "-o") == 0;
+    }
+
+  toplev_argv_hash = val;
+}
+/* APPLE LOCAL end jet */
 
 /* Entry point of cc1, cc1plus, jc1, f771, etc.
    Decode command args, then call compile_file.
@@ -5967,6 +5994,9 @@ toplev_main (argc, argv)
 {
   /* Initialization of GCC's environment, and diagnostics.  */
   general_init (argv[0]);
+  /* APPLE LOCAL begin jet */
+  init_toplev_hash_code (argc, argv);
+  /* APPLE LOCAL end jet */
 
   /* Parse the options and do minimal processing; basically just
      enough to default flags appropriately.  */

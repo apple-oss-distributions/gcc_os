@@ -2284,3 +2284,29 @@ _cpp_aligned_alloc (pfile, len)
   buff->cur = result + len;
   return result;
 }
+
+/* Say which field of TOK is in use.  */
+
+enum cpp_token_fld_kind
+cpp_token_val_index (tok)
+     cpp_token *tok;
+{
+  switch (TOKEN_SPELL (tok))
+    {
+    case SPELL_IDENT:
+      return CPP_TOKEN_FLD_NODE;
+    case SPELL_STRING:
+    case SPELL_NUMBER:
+      return CPP_TOKEN_FLD_STR;
+    case SPELL_CHAR:
+      return CPP_TOKEN_FLD_C;
+    case SPELL_NONE:
+      if (tok->type == CPP_MACRO_ARG)
+	return CPP_TOKEN_FLD_ARG_NO;
+      else if (tok->type == CPP_PADDING)
+	return CPP_TOKEN_FLD_SOURCE;
+      /* else fall through */
+    default:
+      return CPP_TOKEN_FLD_NONE;
+    }
+}

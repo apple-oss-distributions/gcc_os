@@ -1,6 +1,6 @@
 /* -*- indented-text -*- */
 /* Process source files and output type information.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
 
 This file is part of GCC.
 
@@ -42,6 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 %token STRUCT "struct"
 %token ENUM "enum"
 %token ALIAS "ptr_alias"
+%token NESTED_PTR
 %token <s>PARAM_IS
 %token NUM
 %token PERCENTPERCENT "%%"
@@ -280,6 +281,15 @@ option:	type_option '(' type ')'
 	     o->info = (void *)$3;
 	     $$ = o;
 	   }
+	| NESTED_PTR '(' type ',' STRING ',' STRING ')'
+	    {
+	      struct nested_ptr_data d =
+	        { adjust_field_type ($3, NULL), $5, $7 };
+	      options_p o = xmalloc (sizeof (*o));
+	      o->name = "nested_ptr";
+	      o->info = xmemdup (&d, sizeof (d), sizeof (d));
+	      $$ = o;
+	    }
 	;
 
 optionseq: option

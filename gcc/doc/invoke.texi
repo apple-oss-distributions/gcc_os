@@ -1689,6 +1689,16 @@ of the language, you can save some space by using this flag.  Note that
 exception handling uses the same information, but it will generate it as
 needed.
 
+@c APPLE LOCAL begin jet
+@item -fskip-unused-source
+@opindex fskip-unused-source
+Skip declarations in the input files that aren't actually needed.
+This flag doesn't change the meaning of correct source code, but it
+can suppress diagnostics about incorrect source code and suppress
+output of debugging information for the parts of the input that are
+skipped.
+@c APPLE LOCAL end jet
+
 @item -fstats
 @opindex fstats
 Emit statistics about front-end processing at the end of the compilation.

@@ -100,3 +100,4 @@
 3222264: g++.pt/repo3.C (test for excess errors)
 3222264: g++.pt/repo4.C (test for excess errors)
 3239450: g++.pt/instantiate12.C caused compiler crash
+3458257: g++.dg/abi/rtti1.C scan-assembler-dem-not

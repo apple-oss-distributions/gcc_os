@@ -4500,6 +4500,9 @@ extern int  cxx_dump_lineno_p 			PARAMS ((FILE *, tree));
 extern int  cxx_dmp_tree3			PARAMS ((FILE *, tree, int));
 /* APPLE LOCAL end new tree dump */
 
+/* APPLE LOCAL CW asm blocks */
+extern tree cw_asm_cp_build_component_ref	PARAMS ((tree, tree));
+
 /* -- end of C++ */
 
 #endif /* ! GCC_CP_TREE_H */

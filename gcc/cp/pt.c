@@ -10454,6 +10454,8 @@ instantiate_pending_templates ()
   tree last = NULL_TREE;
   int instantiated_something = 0;
   int reconsider;
+  int line = lineno;
+  const char *file = input_filename;
   
   do 
     {
@@ -10527,6 +10529,9 @@ instantiate_pending_templates ()
       last_pending_template = last;
     } 
   while (reconsider);
+
+  lineno = line;
+  input_filename = file;
 
   return instantiated_something;
 }

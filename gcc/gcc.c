@@ -2817,8 +2817,8 @@ execute ()
 	if (string)
 	  commands[n_commands].argv[0] = string;
 	/* APPLE LOCAL begin radar 2466994 - pass linker output through c++filt  ilr */
-	else if (strcmp (commands[n_commands].prog, "c++filt3") == 0
-		 && access ("/usr/bin/c++filt3", X_OK) != 0)
+	else if (strcmp (commands[n_commands].prog, "c++filt") == 0
+		 && access ("/usr/bin/c++filt", X_OK) != 0)
 	  continue;
 	/* APPLE LOCAL end radar 2466994 - pass linker output through c++filt  ilr */
 	n_commands++;

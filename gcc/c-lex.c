@@ -161,6 +161,16 @@ init_c_lex (filename)
   return cpp_read_main_file (parse_in, filename, ident_hash);
 }
 
+/* APPLE LOCAL begin jet */
+/* This is only here because of the backport: in 3.5 there's a
+   better way to do things.  Conceptually this should be C++-only.
+   It's here because there's no other convenient place to do
+   initialization after pch initialization but before the C++
+   yacc-based parser is invoked.
+*/
+void initialize_jet (void);
+/* APPLE LOCAL end jet */
+
 /* A thin wrapper around the real parser that initializes the 
    integrated preprocessor after debug output has been initialized.
    Also, make sure the start_source_file debug hook gets called for
@@ -191,6 +201,12 @@ c_common_parse_file (set_yydebug)
   (*debug_hooks->start_symbol_repository) (lineno, input_filename, 
 					   cpp_get_stabs_checksum ());
   /* APPLE LOCAL end Symbol Separation */
+
+  /* APPLE LOCAL begin jet */
+  /* 3.3 backport only. */
+  if (flag_jet)
+    initialize_jet ();
+  /* APPLE LOCAL end jet */
 
   yyparse ();
   free_parser_stacks ();

@@ -7718,6 +7718,14 @@ count_reg_usage (x, counts, dest, incr)
         count_reg_usage (XEXP (note, 0), counts, NULL_RTX, incr);
       return;
 
+      /* APPLE LOCAL begin asm statement optimization fix from post-3.3 */
+    case ASM_OPERANDS:
+      /* Iterate over just the inputs, not the constraints as well.  */
+      for (i = ASM_OPERANDS_INPUT_LENGTH (x) - 1; i >= 0; i--)
+	count_reg_usage (ASM_OPERANDS_INPUT (x, i), counts, NULL_RTX, incr);
+      return;
+      /* APPLE LOCAL end asm statement optimization fix from post-3.3 */
+
     case INSN_LIST:
       abort ();
 

@@ -240,7 +240,7 @@ Boston, MA 02111-1307, USA.  */
     %{!Zdynamiclib:%{!A:%{!nostdlib:%{!nostartfiles:%S}}}} \
     %{L*} %(link_libgcc) %o %{!nostdlib:%{!nodefaultlibs:%G %L}} \
     %{!A:%{!nostdlib:%{!nostartfiles:%E}}} %{T*} %{F*} \
-    %{!--help:%{!no-c++filt|c++filt:| c++filt3 }} }}}}}}}}}"
+    %{!--help:%{!no-c++filt|c++filt:| c++filt }} }}}}}}}}}"
 
 /* Note that the linker
    output is always piped through c++filt (unless -no-c++filt is
@@ -1021,6 +1021,10 @@ enum machopic_addr_class {
     fprintf ((FILE),							   \
 	     (name_needs_quotes(LAB) 					   \
 	      ? "\t\"%s.eh\" = 0\n" : "\t%s.eh = 0\n"),			   \
+	     (LAB));							   \
+    fprintf ((FILE),							   \
+	     (name_needs_quotes(LAB) 					   \
+	      ? ".no_dead_strip \"%s.eh\"\n" : ".no_dead_strip %s.eh\n"),  \
 	     (LAB));							   \
   } while (0)
 

@@ -8080,4 +8080,21 @@ loop_transpose (fn)
 }
 /* APPLE LOCAL end loop transposition */
 
+/* APPLE LOCAL begin CW asm blocks */
+/* Look for a struct or union tag, but quietly; don't complain if neither
+   is found, and don't autocreate. Used to identify struct/union tags
+   mentioned in CW asm operands.  */
+tree
+lookup_struct_or_union_tag (tree typename)
+{
+  tree rslt = lookup_tag (RECORD_TYPE, typename, current_binding_level, 0);
+
+  pending_invalid_xref = 0;
+  if (!rslt)
+    rslt = lookup_tag (UNION_TYPE, typename, current_binding_level, 0);
+  pending_invalid_xref = 0;
+  return rslt;
+}
+/* APPLE LOCAL end CW asm blocks */
+
 #include "gt-c-decl.h"

@@ -796,6 +796,7 @@ push_replacement_text (pfile, node)
       cpp_macro *macro = node->value.macro;
       macro->used = 1;
       text = macro->exp.text;
+      macro->traditional = 1;
       len = macro->count;
     }
 
@@ -1037,6 +1038,7 @@ save_replacement_text (pfile, macro, arg_index)
       memcpy (exp, pfile->out.base, len);
       exp[len] = '\0';
       macro->exp.text = exp;
+      macro->traditional = 1;
       macro->count = len;
     }
   else
@@ -1052,6 +1054,7 @@ save_replacement_text (pfile, macro, arg_index)
       exp = BUFF_FRONT (pfile->a_buff);
       block = (struct block *) (exp + macro->count);
       macro->exp.text = exp;
+      macro->traditional = 1;
 
       /* Write out the block information.  */
       block->text_len = len;

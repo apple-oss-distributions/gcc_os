@@ -6590,8 +6590,17 @@ finish_message_expr (receiver, sel_name, method_params)
 	}
       else
 	{
+#ifdef OBJCPLUS
+	  /* In Objective-C++, the receiver could be a C++ class that
+	     defines an 'operator id(void)' or some such.  So, as a last-
+	     ditch effort, we attempt to convert the receiver to 'id'.
+	     If this is not possible, the convert machinery will issue
+	     the appropriate diagnostic.  */
+	  receiver = convert (id_type, receiver);
+#else
 	  warning ("invalid receiver type `%s'",
-		   gen_declaration (orig_rtype, errbuf));   
+		   gen_declaration (orig_rtype, errbuf));
+#endif
 	  rtype = NULL_TREE;
 	  method_prototype = lookup_method_in_hash_lists (sel_name);
 	}
@@ -9687,10 +9696,13 @@ gen_declspecs (declspecs, buf, raw)
 	  if (OBJC_TYPE_NAME (declspecs)
 	      && TREE_CODE (OBJC_TYPE_NAME (declspecs)) == IDENTIFIER_NODE)
 	    {
-	      tree protocol_list = TYPE_PROTOCOL_LIST (declspecs);
+	      tree protocol_list = NULL_TREE;
 
-	      if (! TREE_STATIC_TEMPLATE (declspecs))
-		strcat (buf, "struct ");
+	      if (TREE_STATIC_TEMPLATE (declspecs))
+		protocol_list = TYPE_PROTOCOL_LIST (declspecs);
+	      else
+	        strcat (buf, "struct ");
+
 	      strcat (buf, IDENTIFIER_POINTER (OBJC_TYPE_NAME (declspecs)));
 	      /* APPLE LOCAL end type aliasing */
 

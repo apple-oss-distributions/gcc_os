@@ -4474,6 +4474,23 @@ rs6000_function_value (valtype, func)
                                                       gen_rtx_CONST_INT
                                                         (SImode, 4))));
     }
+  if (GET_MODE_CLASS (TYPE_MODE (valtype)) == MODE_COMPLEX_FLOAT
+      && TARGET_POWERPC64 && TARGET_32BIT)
+    {
+      /* complex types need be split in multiple registers. */
+      mode = TYPE_MODE (valtype);
+      int n_units = RS6000_ARG_SIZE (mode, valtype);
+      rtx rvec[GET_MODE_SIZE(TCmode) + 1];
+      int k = 0;
+      int i;
+      for (i=0; i < n_units; i++)
+	{
+	  rtx r = gen_rtx_REG (SImode, GP_ARG_RETURN + i);
+	  rtx off = GEN_INT (i * 4);
+	  rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, r, off);
+	}
+      return gen_rtx_PARALLEL (mode, gen_rtvec_v (k, rvec));
+    }
 
   if ((INTEGRAL_TYPE_P (valtype) && TYPE_PRECISION (valtype) < BITS_PER_WORD)
         || POINTER_TYPE_P (valtype))
@@ -4890,6 +4907,26 @@ function_arg (cum, mode, type, named)
                                                           + align_words),
                                                           const0_rtx)));
         }
+      else if (GET_MODE_CLASS (mode) == MODE_COMPLEX_FLOAT 
+	       && TARGET_POWERPC64 && TARGET_32BIT
+	       && align_words < GP_ARG_NUM_REG)
+	{
+	  rtx rvec[GP_ARG_NUM_REG + 1];
+	  int i,k;
+	  int n_units = RS6000_ARG_SIZE (mode, type);
+	  k=0;
+	  if (align_words + n_units > GP_ARG_NUM_REG)
+	    rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, NULL_RTX, const0_rtx);
+	  i = 0;
+  	  do
+    	    {
+      	      rtx r = gen_rtx_REG (SImode, GP_ARG_MIN_REG + align_words);
+      	      rtx off = GEN_INT (i++ * 4);
+      	      rvec[k++] = gen_rtx_EXPR_LIST (VOIDmode, r, off);
+    	    }
+  	  while (++align_words < GP_ARG_NUM_REG && --n_units != 0);
+  	  return gen_rtx_PARALLEL (mode, gen_rtvec_v (k, rvec));
+	}
       /* APPLE LOCAL end 64bit registers, ABI32bit */
       else if (align_words < GP_ARG_NUM_REG)
 	return gen_rtx_REG (mode, GP_ARG_MIN_REG + align_words);

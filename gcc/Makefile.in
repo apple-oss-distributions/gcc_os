@@ -620,6 +620,7 @@ C_TREE_H = c-tree.h $(C_COMMON_H)
 SYSTEM_H = system.h hwint.h $(srcdir)/../include/libiberty.h
 PREDICT_H = predict.h predict.def
 CPPLIB_H = cpplib.h line-map.h
+CPP_ID_DATA_H = cpp-id-data.h
 
 # sed inserts variable overrides after the following line.
 ####target overrides
@@ -1425,7 +1426,7 @@ version.o: version.c version.h
 gtype-desc.o: gtype-desc.c $(CONFIG_H) $(SYSTEM_H) varray.h $(HASHTAB_H) \
 	$(TREE_H) $(RTL_H) function.h insn-config.h $(EXPR_H) $(OPTABS_H) \
 	libfuncs.h debug.h $(GGC_H) bitmap.h $(BASIC_BLOCK_H) hard-reg-set.h \
-	ssa.h cselib.h insn-addr.h
+	ssa.h cselib.h insn-addr.h $(CPP_ID_DATA_H)
 
 # APPLE LOCAL pch
 ggc-common.o: ggc-common.c $(CONFIG_H) $(SYSTEM_H) $(GGC_H) $(HASHTAB_H) \
@@ -1966,7 +1967,7 @@ s-preds: genpreds$(build_exeext) $(srcdir)/move-if-change
 	$(STAMP) s-preds
 
 GTFILES = $(GCONFIG_H) \
-  $(HASHTAB_H) $(SPLAY_TREE_H) $(srcdir)/cpplib.h \
+  $(HASHTAB_H) $(SPLAY_TREE_H) $(srcdir)/cpplib.h $(srcdir)/cpp-id-data.h \
   $(srcdir)/location.h $(srcdir)/bitmap.h $(srcdir)/function.h \
   $(srcdir)/rtl.h $(srcdir)/optabs.h $(srcdir)/tree.h $(srcdir)/libfuncs.h \
   $(srcdir)/hashtable.h $(srcdir)/real.h \

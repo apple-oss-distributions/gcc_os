@@ -967,6 +967,8 @@ extern int rs6000_default_long_calls;
    ? ((GET_MODE_SIZE (MODE) + UNITS_PER_SPE_WORD - 1) / UNITS_PER_SPE_WORD) \
    : ALTIVEC_REGNO_P (REGNO)						\
    ? ((GET_MODE_SIZE (MODE) + UNITS_PER_ALTIVEC_WORD - 1) / UNITS_PER_ALTIVEC_WORD) \
+   : (GET_MODE_CLASS (MODE) == MODE_COMPLEX_FLOAT) \
+   ? ((GET_MODE_SIZE (MODE) + (TARGET_32BIT ? 4 : 8) - 1) / (TARGET_32BIT ? 4 : 8)) \
    : ((GET_MODE_SIZE (MODE) + UNITS_PER_WORD - 1) / UNITS_PER_WORD))
 
 /* APPLE LOCAL begin 64bit registers, ABI32bit */
