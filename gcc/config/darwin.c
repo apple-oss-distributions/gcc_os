@@ -96,6 +96,12 @@ make_decl_coalesced (decl, private_extern_p)
 }
 /* APPLE LOCAL end coalescing  */
 
+/* APPLE LOCAL begin backport 3721776 fix from FSF mainline. */
+/* Nonzero if the user passes the -mone-byte-bool switch, which forces
+   sizeof(bool) to be 1. */
+const char *darwin_one_byte_bool = 0;
+/* APPLE LOCAL end backport 3721776 fix from FSF mainline. */
+
 int
 name_needs_quotes (name)
      const char *name;

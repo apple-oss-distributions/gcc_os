@@ -1224,20 +1224,6 @@ do_pending_inlines ()
 
       begin_parsing_inclass_inline (first);
     }
-  else
-    {
-      static const char *prev_input_filename;
-      if (prev_input_filename != input_filename
-	  && current_namespace == global_namespace
-	  && current_lang_depth() == 0
-	  && current_class_depth == 0
-	  && current_instantiation() == NULL_TREE
-	  && current_function_decl == NULL_TREE)
-	{
-	  prev_input_filename = input_filename;
-	  instantiate_pending_templates ();
-	}
-    }
 }
 
 /* Called from the fndecl rule in the parser when the function just parsed
